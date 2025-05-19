@@ -1,0 +1,19 @@
+select leg_date,paid_Date from driverpay where driver_id = 'Jh' and date(leg_date)>'04/01/2025'
+
+It has to assign to a payment run 
+assign payment
+Driver statement 
+Check date
+
+
+4- reallocatoin
+Driver statement = True
+Pay_date = 05/01/2025
+payable amount - total amount during that period
+fuel - calculate the fsc
+
+
+
+5- cut of inoiced report"
+billed invoice
+logic delivery date < parameter 1 and invoice date between parameter 2 and parameter 3

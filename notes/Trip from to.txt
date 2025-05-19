@@ -1,0 +1,69 @@
+trip from to 
+
+first query
+
+SELECT
+    /* first‑leg origin */
+    (
+      SELECT LEGO_ZONE_DESC
+      FROM   TMWIN.LEGSUM
+      WHERE  LS_TRIP_NUMBER = 2928
+      ORDER  BY LS_LEG_SEQ        -- lowest sequence
+      FETCH FIRST 1 ROW ONLY
+    )  AS TRIP_FROM,
+
+    /* last‑leg destination */
+    (
+      SELECT LEGD_ZONE_DESC
+      FROM   TMWIN.LEGSUM
+      WHERE  LS_TRIP_NUMBER = 2928
+      ORDER  BY LS_LEG_SEQ DESC   -- highest sequence
+      FETCH FIRST 1 ROW ONLY
+    )  AS TRIP_TO
+FROM SYSIBM.SYSDUMMY1;            -- single dummy row
+
+
+
+or you can use the second query
+==============================================
+WITH seq_bounds AS (
+  SELECT
+         MIN(LS_LEG_SEQ) AS MIN_SEQ,
+         MAX(LS_LEG_SEQ) AS MAX_SEQ
+  FROM   TMWIN.LEGSUM
+  WHERE  LS_TRIP_NUMBER = 2928
+)
+SELECT
+       f.LEGO_ZONE_DESC AS TRIP_FROM,
+       t.LEGD_ZONE_DESC AS TRIP_TO
+FROM   seq_bounds b
+JOIN   TMWIN.LEGSUM  f
+       ON f.LS_TRIP_NUMBER = 2928
+      AND f.LS_LEG_SEQ     = b.MIN_SEQ
+JOIN   TMWIN.LEGSUM  t
+       ON t.LS_TRIP_NUMBER = 2928
+      AND t.LS_LEG_SEQ     = b.MAX_SEQ;
+
+
+
+
+======================================
+
+from only 
+
+======================================
+SELECT LEGO_ZONE_DESC   AS TRIP_FROM
+FROM   TMWIN.LEGSUM
+WHERE  LS_TRIP_NUMBER = 2928          -- <-- trip #
+ORDER  BY LS_LEG_SEQ                  -- lowest sequence first
+FETCH FIRST 1 ROW ONLY;
+
+======================================
+to only 
+
+======================================
+SELECT LEGD_ZONE_DESC   AS TRIP_TO
+FROM   TMWIN.LEGSUM
+WHERE  LS_TRIP_NUMBER = 2928          -- <-- trip #
+ORDER  BY LS_LEG_SEQ DESC             -- highest sequence first
+FETCH FIRST 1 ROW ONLY;

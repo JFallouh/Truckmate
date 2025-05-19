@@ -1,0 +1,287 @@
+SELECT DISTINCT
+  UPPER(L.LEGD_ZONE_DESC) AS LEG_TO
+FROM LEGSUM L
+ORDER BY LEG_TO;
+
+
+LEG_TO                          
+=============================== 
+
+100 MILE HOUSE, BC              
+79998 ,EL PASO                  
+ABBOTSFORD, BC                  
+ACHESON, AB                     
+ACHESON,AB                      
+AGENT AJW                       
+AGENT ARKAM                     
+AGENT DLM WEINS CARTAGE         
+AGENT JJL STORAGE               
+AGENT MONROE TRANSPORT SERVICE  
+AGENT NATIONAL CARTAGE          
+AGENT ONE TRANSPORT GROUP       
+AGENT ROLLS RIGHT               
+AGENT TRANS FREIGHT LOGISTICS   
+AIRDRIE, AB                     
+AJAX, ON                        
+ALBANY, GA                      
+ALEXANDRIA BAY, NY              
+ALTONA, MB                      
+ANJOU, QC                       
+ATLANTA, GA                     
+ATS ETOBICOKE                   
+AURORA, IL                      
+AUSTELL WAREHOUSE               
+AUSTELL, GA                     
+BARRIE, ON                      
+BATAVIA, IL                     
+BDC                             
+BDC BRAMPTON                    
+BEAUSEJOUR, MB                  
+BEAVER RIVER, NY                
+BEAVERDAM, OH                   
+BECANCOUR, QC                   
+BEDFORD PARK, IL                
+BELLEVILLE, ON                  
+BETHLEHEM, PA                   
+BOGER CITY, NC                  
+BOLINGBROOK, IL                 
+BOLTON, ON                      
+BOUCHERVILLE, QC                
+BRAMPTON TERMINAL               
+BRAMPTON, ON                    
+BRANDON, MB                     
+BROOKS                          
+BROOKS JBS AB                   
+BROOKS, AB                      
+BROSSARD, QC                    
+BUFFALO, NY                     
+BURNABY, BC                     
+BURNS LK, BC                    
+CALGARY, AB                     
+CALGARY,AB                      
+CAMPBELL RIVER, BC              
+CARLISLE, PA                    
+CAROL STREAM, IL                
+CHAMPAIGN, IL                   
+CHEMAINUS, BC                   
+CHICAGO HEIGHTS, IL             
+CHICAGO, IL                     
+CHILLIWACK, BC                  
+COCHRANE, AB                    
+COLBURN, IN                     
+COLQUITT, GA                    
+COLUMBIA CITY, IN               
+CONCORD, ON                     
+COQUITLAM, BC                   
+CORNWALL, ON                    
+DALLAS, TX                      
+DARTMOUTH, NS                   
+DELTA, BC                       
+DETROIT, MI                     
+DIEPPE, NB                      
+DORVAL, QC                      
+DOUGLAS, GA                     
+DOVER, DE                       
+DOWNERS GROVE, IL               
+DUNCAN, BC                      
+EAST HANOVER, NJ                
+EAST TROY, WI                   
+EAST YORK, ON                   
+EDINBURGH, IN                   
+EDMONTON, AB                    
+ELK GROVE VILLAGE, IL           
+ELWOOD, IL                      
+ERSKINE, AB                     
+ETOBICOKE, ON                   
+FAIRBURN, GA                    
+FLOWERY BR, GA                  
+FLOWERY BRANCH                  
+FOAM LK, SK                     
+FOGELSVILLE, PA                 
+FRANKFORT, IL                   
+FRANKLIN, VA                    
+FRANKSVILLE, WI                 
+FREMONT, OH                     
+FT MCMURRAY, AB                 
+FT WORTH, TX                    
+GARLAND, TX                     
+GEORGETOWN, ON                  
+GIBBONS, AB                     
+GLENVIEW, IL                    
+GRANDE PRAIRIE, AB              
+GREENVILLE, TX                  
+GROVEPORT, OH                   
+GUELPH, ON                      
+HAGERSTOWN, MD                  
+HAMILTON, ON                    
+HANNON, ON                      
+HAZLE TOWNSHIP, PA              
+HENRIETTA, NY                   
+HINCHINBROOKE, QC               
+HOUSTON, TX                     
+INDIANAPOLIS, IN                
+INGLESIDE, ON                   
+JOLIET WHSE                     
+JOLIET, IL                      
+KAMLOOPS, BC                    
+KANNAN TRUCK AND TRAILER        
+KAPUSKASING, ON                 
+KCI MILTON                      
+KELOWNA, BC                     
+KENDALLVILLE, IN                
+KENNESAW GA                     
+KENNESAW, GA                    
+KINGS, IL                       
+KINGSTON, ON                    
+KITCHENER, ON                   
+KONINK INGLESIDE                
+KRAFT AURORA                    
+KRAFT MOUNT ROYAL               
+KRAFT PEANUTS                   
+LA VISTA, NE                    
+LAC DU BONNET, MB               
+LACHINE, QC                     
+LAKEVILLE, MN                   
+LANCASTER, ON                   
+LANGLEY, BC                     
+LANSDOWNE, ON                   
+LASALLE, QC                     
+LAVAL, QC                       
+LE MARS, IA                     
+LEDUC, AB                       
+LETHBRIDGE, AB                  
+LISBON, WI                      
+LLOYDMINSTER, AB                
+LONDON, ON                      
+LOUDON, TN                      
+LUND, BC                        
+MARKHAM, ON                     
+MARS BOLTON                     
+MEDICINE HAT, AB                
+MELROSE PARK, IL                
+MERCURY MARINE                  
+MIDDLETON, NS                   
+MILTON, ON                      
+MISSISSAUGA, ON                 
+MONCTON, NB                     
+MONT-ROYAL, QC                  
+MONT-TREMBLANT, QC              
+MONTREAL-EST, QC                
+MONTREAL-NORD, QC               
+MONTREAL, QC                    
+MORRIS, IL                      
+MOUNT PROSPECT, IL              
+NANAIMO, BC                     
+NANTON, AB                      
+NB-ABERCOR                      
+NB-FORT                         
+NB-LANS                         
+NB-SARNIA                       
+NB-WINDSOR                      
+NEENAH, WI                      
+NEOSHO, MO                      
+NEWMARKET MARS                  
+NEWMARKET, ON                   
+NEWVILLE, PA                    
+NIAGARA ON THE LK, ON           
+NIPAWIN, SK                     
+NORTH YORK, ON                  
+NORTHWOODS, IL                  
+OAKVILLE, ON                    
+OROMOCTO, NB                    
+OSHAWA, ON                      
+PENDING                         
+PENSE, SK                       
+PHOENIXVILLE, PA                
+PICKERING, ON                   
+PITT MEADOWS, BC                
+PRINCE ALBERT, SK               
+PRINCE GEORGE, BC               
+PRINCE RUPERT, BC               
+PROGRESS MONDELEZ               
+PT ALBERNI, BC                  
+PT COQUITLAM, BC                
+PT MOODY, BC                    
+QUEEN CHARLOTTE, BC             
+REGINA, SK                      
+RICHMOND HILL, ON               
+RICHMOND, BC                    
+ROCKY VIEW, AB                  
+ROCKY VIEW,AB                   
+SAANICHTON, BC                  
+SALMON ARM, BC                  
+SALT SPRING ISLAND, BC          
+SANDSPIT, BC                    
+SARNIA, ON                      
+SASKATOON, SK                   
+SAULT S MARIE, MI               
+SAULT STE MARIE, ON             
+SB-ALEX                         
+SB-BUFFALO                      
+SB-DETRI-M                      
+SB-DETRIOT                      
+SB-DETROIT                      
+SB-PH                           
+SB-SWEET-M                      
+SCARBOROUGH, ON                 
+SHELLBROOK, SK                  
+SHERWOOD PARK, AB               
+SILGAN LACHINE                  
+SMITHERS, BC                    
+SOUTH SIOUX CITY, NE            
+SPECTRUM KENNEDY                
+SPRINGFIELD, MO                 
+SPRUCE GROVE, AB                
+ST ALBERT, AB                   
+ST CLAIR, MI                    
+ST-BRUNO, QC                    
+ST-LAURENT, QC                  
+ST-LEONARD, QC                  
+STE-ANNE-DE-BELLEVUE, QC        
+STE-SOPHIE, QC                  
+STEINBACH, MB                   
+STEWART VALLEY, SK              
+STONEY CREEK GREEN ROAD         
+STONEY CREEK, ON                
+STONY PLAIN, AB                 
+STRASBOURG, SK                  
+SUFFOLK, VA                     
+SURREY, BC                      
+SWEET GRASS, MT                 
+SYLVESTER, GA                   
+SYRACUSE, NY                    
+TERRE HAUTE, IN                 
+THOMPSON, MB                    
+TOFINO, BC                      
+TOPAC MARS                      
+TORONTO, ON                     
+TRENTON, ON                     
+TSAWWASSEN, BC                  
+UNION CITY, GA                  
+VANCOUVER, BC                   
+VARENNES, QC                    
+VAUDREUIL TERMINAL              
+VAUDREUIL-DORION, QC            
+VAUGHAN, ON                     
+VERNON, BC                      
+VESPER, WI                      
+VICTORIA, BC                    
+VICTORIAVILLE, QC               
+WACO PLANT SNACK                
+WACO, TX                        
+WAUSAU, WI                      
+WELLAND, ON                     
+WESTLOCK, AB                    
+WETASKIWIN, AB                  
+WHITE CITY, SK                  
+WINCHESTER, ON                  
+WINDHAM CENTRE, ON              
+WINDSOR TUNNEL CROSSING         
+WINDSOR, ON                     
+WINKLER, MB                     
+WINNIPEG, MB                    
+WOODBRIDGE, ON                  
+WOODSTOCK, IL                   
+YORKVILLE IL                    
+YORKVILLE, IL                   
+<null>                          
