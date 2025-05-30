@@ -1,0 +1,13 @@
+\\tlci-agt01\Crystal Reports
+\\tlci-agt01\Crystal Reports\Custom
+
+
+\\tlci-app01\C$\Program Files (x86)\TruckMate\Reports
+\\tlci-app02\C$\Program Files (x86)\TruckMate\Reports
+\\tlci-app03\C$\Program Files (x86)\TruckMate\Reports
+
+
+\\tlci-app03\c$\Program Files (x86)\TruckMate\Reports
+
+
+\\tlci-tapp01\c$\Program Files (x86)\TruckMate\Reports
