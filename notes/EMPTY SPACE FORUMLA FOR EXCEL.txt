@@ -1,0 +1,2 @@
+If IsNull({JF.BOL}) or Trim({JF.BOL}) = "" Then Chr(160) Else {JF.BOL}
+JF.PAGE_STOP4_LINE_4
