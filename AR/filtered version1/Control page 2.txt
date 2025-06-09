@@ -25,14 +25,7 @@ SELECT
   CASE WHEN B.ACCT_CODE LIKE '%-2200-%' THEN '40' ELSE '20' END CNTLINE,
   0 QTYINVC,
   B.AMOUNT,
-  --SPLIT_PART(B.ACCT_CODE, '-', 2) AS IDACCTREV,
-  SUBSTR(
-    B.ACCT_CODE,
-    LOCATE('-', B.ACCT_CODE) + 1,
-    -- length = position of 2nd hyphen minus position of 1st hyphen minus 1
-    LOCATE('-', B.ACCT_CODE, LOCATE('-', B.ACCT_CODE) + 1)
-      - LOCATE('-', B.ACCT_CODE) - 1
-  ) AS IDACCTREV,
+  B.ACCT_CODE IDACCTREV,
   B.AMOUNT DISTNETHC,
   B.AMOUNT AMTECTNHC
 FROM X
