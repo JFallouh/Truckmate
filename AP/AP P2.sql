@@ -1,29 +1,30 @@
 WITH X_HEADER AS (
-  /* same CTE as above */
   SELECT
-    OI.SRC_SOURCE_AUDIT                                             AS CNTBTCH,
+    VARCHAR_FORMAT(CURRENT DATE, 'YYMMDD')                                       AS CNTBTCH,
     ROW_NUMBER() OVER (
-      PARTITION BY OI.SRC_SOURCE_AUDIT
+      PARTITION BY VARCHAR_FORMAT(CURRENT DATE, 'YYMMDD')
       ORDER BY
-        OI.SRC_SOURCE_AUDIT,
+        VARCHAR_FORMAT(CURRENT DATE, 'YYMMDD'),
         OIU.USER3,
         COALESCE(T.BILL_NUMBER, T2.BILL_NUMBER)
-    )                                                               AS CNTITEM,
-    OIU.USER3                                                        AS IDCUST,
-    '1'                                                              AS TEXTTRX,
-    COALESCE(T.BILL_NUMBER, T2.BILL_NUMBER)                          AS IDINVC,
-    VARCHAR_FORMAT(
-      COALESCE(T.BILL_DATE, T2.BILL_DATE),
-      'YYYY-MM-DD'
-    )                                                               AS DATEINVC,
-    OI.PROBILL                                                       AS ORDRNBR,
-    '1'                                                              AS SWTAXBL,
-    '0'                                                              AS SWCALCTX,
-    '0'                                                              AS AMTTAX1,
-    '0'                                                              AS AMTTAX2,
-    SUM(IP.DEBIT_AMT) - SUM(IP.CREDIT_AMT)                            AS AMTGROSTOT,
-    '1'                                                              AS SWMANTX,
-    OI.ORDER_INTERLINER_ID                                           AS IDKEY
+    )                                                                             AS CNTITEM,
+    OIU.USER3                                                                     AS IDCUST,
+    '1'                                                                           AS TEXTTRX,
+    COALESCE(T.BILL_NUMBER, T2.BILL_NUMBER)                                       AS IDINVC,
+    VARCHAR_FORMAT(OI.SRC_APPROVAL_DATE, 'YYYY-MM-DD')                            AS DATEINVC,
+    OI.PROBILL                                                                    AS ORDRNBR,
+    '1'                                                                           AS SWTAXBL,
+    '0'                                                                           AS SWCALCTX,
+    '0'                                                                           AS AMTTAX1,
+    '0'                                                                           AS AMTTAX2,
+    SUM(
+      CASE WHEN IP.ACCT_CODE = '01-4000-00'
+           THEN IP.DEBIT_AMT - IP.CREDIT_AMT
+           ELSE 0
+      END
+    )                                                                             AS AMTGROSTOT,
+    '1'                                                                           AS SWMANTX,
+    OI.ORDER_INTERLINER_ID                                                        AS IDKEY
   FROM ORDER_INTERLINER OI
   JOIN ORDER_INTERLINER_USERFIELDS OIU
     ON OIU.ORDER_INTERLINER_ID = OI.ORDER_INTERLINER_ID
@@ -37,39 +38,46 @@ WITH X_HEADER AS (
     ON (OI.CHILD_DETAIL_LINE_ID > 0 AND OI.CHILD_TYPE <> 'S')
    AND T2.DETAIL_LINE_ID      = OI.CHILD_DETAIL_LINE_ID
   WHERE
-      OI.INTERFACE_STATUS = 'S'
-  --  AND COALESCE(T.BILL_DATE, T2.BILL_DATE)
-       -- BETWEEN DATE('2025-06-20') AND DATE('2025-06-20')
+    OI.INTERFACE_STATUS = 'S'
   GROUP BY
-    OI.SRC_SOURCE_AUDIT,
+    VARCHAR_FORMAT(CURRENT DATE, 'YYMMDD'),
     OIU.USER3,
     COALESCE(T.BILL_NUMBER, T2.BILL_NUMBER),
-    VARCHAR_FORMAT(COALESCE(T.BILL_DATE, T2.BILL_DATE), 'YYYY-MM-DD'),
+    VARCHAR_FORMAT(OI.SRC_APPROVAL_DATE, 'YYYY-MM-DD'),
     OI.PROBILL,
     OI.ORDER_INTERLINER_ID
+  HAVING
+    SUM(
+      CASE WHEN IP.ACCT_CODE = '01-4000-00'
+           THEN IP.DEBIT_AMT - IP.CREDIT_AMT
+           ELSE 0
+      END
+    ) <> 0
 )
 SELECT
   H.CNTBTCH,
   H.CNTITEM,
-  CASE 
-    WHEN IP.ACCT_CODE LIKE '%-2200-%' 
-      THEN '40' 
-    ELSE '20' 
-  END                                                               AS CNTLINE,
-  '0'                                                                 AS AMTTAX1,
-  '0'                                                                 AS AMTTAX2,
-  IP.ACCT_CODE                                                       AS IDGLACCT,
+  '40'                                                                         AS CNTLINE,
+  '0'                                                                          AS AMTTAX1,
+  '0'                                                                          AS AMTTAX2,
+  -- trim “01-4000-00” → “4000”
+  SUBSTR(
+    IP.ACCT_CODE,
+    LOCATE('-', IP.ACCT_CODE) + 1,
+    LOCATE('-', IP.ACCT_CODE, LOCATE('-', IP.ACCT_CODE) + 1)
+      - LOCATE('-', IP.ACCT_CODE) - 1
+  )                                                                             AS IDGLACCT,
   CASE 
     WHEN IP.DEBIT_AMT > IP.CREDIT_AMT 
       THEN IP.DEBIT_AMT - IP.CREDIT_AMT 
     ELSE IP.CREDIT_AMT - IP.DEBIT_AMT 
-  END                                                               AS AMTDIST
+  END                                                                            AS AMTDIST
 FROM X_HEADER H
 JOIN IP_GL IP
   ON IP.ORDER_INTERLINER_ID = H.IDKEY
  AND IP.SOURCE_TYPE         = 'IP Source Register'
+ AND IP.ACCT_CODE          = '01-4000-00'
 ORDER BY
   H.CNTBTCH,
   H.CNTITEM,
-  CNTLINE,
   IDGLACCT;
