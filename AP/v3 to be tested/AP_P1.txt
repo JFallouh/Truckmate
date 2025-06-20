@@ -1,0 +1,81 @@
+WITH
+  LEG_MAX AS (
+    SELECT
+      LS_LEG_ID,
+      MAX(LS_TRIP_NUMBER) AS TRIP_NUMBER
+    FROM LEGSUM
+    GROUP BY LS_LEG_ID
+  ),
+  X_HEADER AS (
+    SELECT
+      VARCHAR_FORMAT(CURRENT DATE,'YYMMDD')               AS CNTBTCH,
+      ROW_NUMBER() OVER (
+        PARTITION BY VARCHAR_FORMAT(CURRENT DATE,'YYMMDD')
+        ORDER BY
+          VARCHAR_FORMAT(CURRENT DATE,'YYMMDD'),
+          V.USER3,
+          LEG_MAX.TRIP_NUMBER
+      )                                                    AS CNTITEM,
+      V.USER3                                              AS IDVEND,
+      '1'                                                  AS TEXTTRX,
+      LEG_MAX.TRIP_NUMBER                                  AS IDINVC,
+      V.NAME                                               AS DESCRIPTION,
+      VARCHAR_FORMAT(OI.SRC_APPROVAL_DATE,'YYYY-MM-DD')    AS DATEINVC,
+      MAX(OI.PROBILL)                                      AS ORDRNBR,    -- <<<< pick one
+      '1'                                                  AS SWTAXBL,
+      '0'                                                  AS SWCALCTX,
+      '0'                                                  AS AMTTAX1,
+      '0'                                                  AS AMTTAX2,
+      SUM(
+        CASE 
+          WHEN IP.ACCT_CODE = '01-4000-00'
+            THEN ABS(IP.DEBIT_AMT - IP.CREDIT_AMT)
+          ELSE 0
+        END
+      )                                                    AS AMTGROSTOT,
+      '1'                                                  AS SWMANTX,
+      LEG_MAX.TRIP_NUMBER                                  AS IDKEY
+    FROM ORDER_INTERLINER OI
+    JOIN ORDER_INTERLINER_USERFIELDS OIU
+      ON OIU.ORDER_INTERLINER_ID = OI.ORDER_INTERLINER_ID
+    LEFT JOIN VENDOR V
+      ON V.VENDOR_ID = OI.INTERLINER_ID
+    LEFT JOIN LEG_MAX
+      ON LEG_MAX.LS_LEG_ID = OI.LEGID
+    LEFT JOIN IP_GL IP
+      ON IP.ORDER_INTERLINER_ID = OI.ORDER_INTERLINER_ID
+     AND IP.SOURCE_TYPE       = 'IP Source Register'
+    WHERE
+      OI.INTERFACE_STATUS = 'S'
+    GROUP BY
+      VARCHAR_FORMAT(CURRENT DATE,'YYMMDD'),
+      V.USER3,
+      V.NAME,
+      LEG_MAX.TRIP_NUMBER,
+      VARCHAR_FORMAT(OI.SRC_APPROVAL_DATE,'YYYY-MM-DD')
+    HAVING
+      SUM(
+        CASE 
+          WHEN IP.ACCT_CODE = '01-4000-00'
+            THEN ABS(IP.DEBIT_AMT - IP.CREDIT_AMT)
+          ELSE 0
+        END
+      ) <> 0
+  )
+SELECT
+  CNTBTCH,
+  CNTITEM,
+  IDVEND,
+  TEXTTRX,
+  IDINVC,
+  DESCRIPTION,
+  DATEINVC,
+  ORDRNBR,
+  SWTAXBL,
+  SWCALCTX,
+  AMTTAX1,
+  AMTTAX2,
+  AMTGROSTOT,
+  SWMANTX
+FROM X_HEADER
+ORDER BY CNTBTCH, CNTITEM;
