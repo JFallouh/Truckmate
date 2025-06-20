@@ -1,0 +1,93 @@
+WITH
+  LEG_MAX AS (
+    SELECT
+      LS_LEG_ID,
+      MAX(LS_TRIP_NUMBER) AS TRIP_NUMBER
+    FROM LEGSUM
+    GROUP BY LS_LEG_ID
+  ),
+
+  /* same header CTE to drive the detail join keys */
+  X_HEADER AS (
+    SELECT
+      VARCHAR_FORMAT(CURRENT DATE, 'YYMMDD')            AS CNTBTCH,
+      ROW_NUMBER() OVER (
+        PARTITION BY VARCHAR_FORMAT(CURRENT DATE, 'YYMMDD')
+        ORDER BY
+          VARCHAR_FORMAT(CURRENT DATE, 'YYMMDD'),
+          V.USER3,
+          LEG_MAX.TRIP_NUMBER
+      )                                                 AS CNTITEM,
+      LEG_MAX.TRIP_NUMBER                               AS TRIP_NUMBER
+    FROM ORDER_INTERLINER OI
+    LEFT JOIN VENDOR V
+      ON V.VENDOR_ID = OI.INTERLINER_ID
+    LEFT JOIN LEG_MAX
+      ON LEG_MAX.LS_LEG_ID = OI.LEGID
+    LEFT JOIN IP_GL IP
+      ON IP.ORDER_INTERLINER_ID = OI.ORDER_INTERLINER_ID
+     AND IP.SOURCE_TYPE       = 'IP Source Register'
+    WHERE
+      OI.INTERFACE_STATUS = 'S'
+    GROUP BY
+      VARCHAR_FORMAT(CURRENT DATE, 'YYMMDD'),
+      V.USER3,
+      LEG_MAX.TRIP_NUMBER
+    HAVING
+      SUM(
+        CASE 
+          WHEN IP.ACCT_CODE = '01-4000-00'
+            THEN ABS(IP.DEBIT_AMT - IP.CREDIT_AMT)
+          ELSE 0
+        END
+      ) <> 0
+  ),
+
+  /* collapse all the matching 01-4000-00 rows into one per trip */
+  DTL AS (
+    SELECT
+      LEG_MAX.TRIP_NUMBER,
+      /* always “40” for this code */
+      '40'                                                       AS CNTLINE,
+      /* strip out the “4000” segment */
+      SUBSTR(
+        IP.ACCT_CODE,
+        LOCATE('-', IP.ACCT_CODE) + 1,
+        LOCATE('-', IP.ACCT_CODE, LOCATE('-', IP.ACCT_CODE) + 1)
+        - LOCATE('-', IP.ACCT_CODE) - 1
+      )                                                          AS IDGLACCT,
+      SUM(ABS(IP.DEBIT_AMT - IP.CREDIT_AMT))                     AS AMTDIST
+    FROM ORDER_INTERLINER OI
+    JOIN LEG_MAX
+      ON LEG_MAX.LS_LEG_ID = OI.LEGID
+    JOIN IP_GL IP
+      ON IP.ORDER_INTERLINER_ID = OI.ORDER_INTERLINER_ID
+     AND IP.SOURCE_TYPE       = 'IP Source Register'
+     AND IP.ACCT_CODE         = '01-4000-00'
+    WHERE
+      OI.INTERFACE_STATUS = 'S'
+    GROUP BY
+      LEG_MAX.TRIP_NUMBER,
+      SUBSTR(
+        IP.ACCT_CODE,
+        LOCATE('-', IP.ACCT_CODE) + 1,
+        LOCATE('-', IP.ACCT_CODE, LOCATE('-', IP.ACCT_CODE) + 1)
+        - LOCATE('-', IP.ACCT_CODE) - 1
+      )
+  )
+
+SELECT
+  H.CNTBTCH,
+  H.CNTITEM,
+  D.CNTLINE,
+  '0'                                                         AS AMTTAX1,
+  '0'                                                         AS AMTTAX2,
+  D.IDGLACCT,
+  D.AMTDIST
+FROM X_HEADER H
+JOIN DTL D
+  ON D.TRIP_NUMBER = H.TRIP_NUMBER
+ORDER BY
+  H.CNTBTCH,
+  H.CNTITEM,
+  D.IDGLACCT;
