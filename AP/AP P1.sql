@@ -1,37 +1,41 @@
 WITH X_HEADER AS (
   SELECT
-    VARCHAR_FORMAT(CURRENT DATE, 'YYMMDD')                                 AS CNTBTCH,
+    VARCHAR_FORMAT(CURRENT DATE, 'YYMMDD')                                                       AS CNTBTCH,
     ROW_NUMBER() OVER (
       PARTITION BY VARCHAR_FORMAT(CURRENT DATE, 'YYMMDD')
       ORDER BY
         VARCHAR_FORMAT(CURRENT DATE, 'YYMMDD'),
         V.USER3,
         COALESCE(T.BILL_NUMBER, T2.BILL_NUMBER)
-    )                                                                       AS CNTITEM,
-    V.USER3                                                                 AS IDVEND,       -- was IDCUST
-    '1'                                                                     AS TEXTTRX,
-    COALESCE(T.BILL_NUMBER, T2.BILL_NUMBER)                                 AS IDINVC,
-    V.NAME                                                                  AS DESCRIPTION,  -- new column
-    VARCHAR_FORMAT(OI.SRC_APPROVAL_DATE, 'YYYY-MM-DD')                      AS DATEINVC,
-    OI.PROBILL                                                              AS ORDRNBR,
-    '1'                                                                     AS SWTAXBL,
-    '0'                                                                     AS SWCALCTX,
-    '0'                                                                     AS AMTTAX1,
-    '0'                                                                     AS AMTTAX2,
+    )                                                                                             AS CNTITEM,
+    V.USER3                                                                                       AS IDVEND,         -- vendor code
+    '1'                                                                                           AS TEXTTRX,
+    COALESCE(T.BILL_NUMBER, T2.BILL_NUMBER)                                                       AS IDINVC,
+    V.NAME                                                                                        AS DESCRIPTION,    -- vendor name
+    VARCHAR_FORMAT(OI.SRC_APPROVAL_DATE, 'YYYY-MM-DD')                                            AS DATEINVC,
+    OI.PROBILL                                                                                    AS ORDRNBR,
+    '1'                                                                                           AS SWTAXBL,
+    '0'                                                                                           AS SWCALCTX,
+    '0'                                                                                           AS AMTTAX1,
+    '0'                                                                                           AS AMTTAX2,
     SUM(
       CASE 
-        WHEN IP.ACCT_CODE = '01-4000-00' 
-          THEN IP.DEBIT_AMT - IP.CREDIT_AMT 
-        ELSE 0 
+        WHEN IP.ACCT_CODE = '01-4000-00'
+          THEN CASE 
+                 WHEN IP.DEBIT_AMT  > IP.CREDIT_AMT 
+                   THEN IP.DEBIT_AMT  - IP.CREDIT_AMT 
+                 ELSE IP.CREDIT_AMT - IP.DEBIT_AMT 
+               END
+        ELSE 0
       END
-    )                                                                       AS AMTGROSTOT,
-    '1'                                                                     AS SWMANTX,
-    OI.ORDER_INTERLINER_ID                                                  AS IDKEY
+    )                                                                                             AS AMTGROSTOT,
+    '1'                                                                                           AS SWMANTX,
+    OI.ORDER_INTERLINER_ID                                                                        AS IDKEY
   FROM ORDER_INTERLINER OI
   JOIN ORDER_INTERLINER_USERFIELDS OIU
     ON OIU.ORDER_INTERLINER_ID = OI.ORDER_INTERLINER_ID
 
-  -- bring in the vendor for IDVEND + DESCRIPTION
+  -- bring in vendor for IDVEND + DESCRIPTION
   LEFT JOIN VENDOR V
     ON V.VENDOR_ID = OI.INTERLINER_ID
 
@@ -61,20 +65,24 @@ WITH X_HEADER AS (
 
   HAVING
     SUM(
-      CASE WHEN IP.ACCT_CODE = '01-4000-00'
-           THEN IP.DEBIT_AMT - IP.CREDIT_AMT
-           ELSE 0
+      CASE 
+        WHEN IP.ACCT_CODE = '01-4000-00'
+          THEN CASE 
+                 WHEN IP.DEBIT_AMT  > IP.CREDIT_AMT 
+                   THEN IP.DEBIT_AMT  - IP.CREDIT_AMT 
+                 ELSE IP.CREDIT_AMT - IP.DEBIT_AMT 
+               END
+        ELSE 0
       END
     ) <> 0
 )
-
 SELECT
   CNTBTCH,
   CNTITEM,
-  IDVEND,         -- vendor user3
+  IDVEND,
   TEXTTRX,
   IDINVC,
-  DESCRIPTION,    -- vendor name
+  DESCRIPTION,
   DATEINVC,
   ORDRNBR,
   SWTAXBL,
